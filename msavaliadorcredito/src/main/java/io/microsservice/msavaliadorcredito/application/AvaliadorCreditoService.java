@@ -3,9 +3,11 @@ package io.microsservice.msavaliadorcredito.application;
 import feign.FeignException;
 import io.microsservice.msavaliadorcredito.application.ex.DadosClienteNotFoundException;
 import io.microsservice.msavaliadorcredito.application.ex.ErroComunicacaoMicroservicesException;
+import io.microsservice.msavaliadorcredito.application.ex.ErroSolicitacaoCartaoException;
 import io.microsservice.msavaliadorcredito.domain.model.*;
 import io.microsservice.msavaliadorcredito.infra.clients.CartoesResourceClient;
 import io.microsservice.msavaliadorcredito.infra.clients.ClienteResourceClient;
+import io.microsservice.msavaliadorcredito.infra.mqueue.SolicitacaoEmissaoCartaoPublisher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,7 @@ public class AvaliadorCreditoService {
     private final ClienteResourceClient clientesClient;
 
     private final CartoesResourceClient cartoesClient;
+    private final SolicitacaoEmissaoCartaoPublisher emissaoCartaoPublisher;
 
     public SituacaoCliente obterSituacaoCliente(String cpf) throws DadosClienteNotFoundException, ErroComunicacaoMicroservicesException {
         try {
@@ -77,6 +81,15 @@ public class AvaliadorCreditoService {
                 throw new DadosClienteNotFoundException();
             }
             throw new ErroComunicacaoMicroservicesException(e.getMessage(), status);
+        }
+    }
+    public ProtocoloSolicitacaoCartao solicitarEmissaoCartao (DadosSolicitacaoEmisssaoCartoes dados){
+        try {
+            emissaoCartaoPublisher.solicitarCartoes(dados);
+            var protocolo = UUID.randomUUID().toString();
+            return new ProtocoloSolicitacaoCartao(protocolo);
+        }catch (Exception e){
+            throw new ErroSolicitacaoCartaoException(e.getMessage());
         }
     }
 }
