@@ -35,10 +35,11 @@ public class AvaliadorCreditoController {
     }
 
     @PostMapping
-    public ResponseEntity realizarAvaliacao (@RequestBody DadosAvaliacao dados){
+    public ResponseEntity realizarAvaliacao( @RequestBody DadosAvaliacao dados ){
         try {
             RetornoAvaliacaoCliente retornoAvaliacaoCliente = avaliadorCreditoService
-                    .realizarAvalioacao(dados.getCpf(), dados.getRenda());
+                    .realizarAvaliacao(dados.getCpf(), dados.getRenda());
+            System.out.println(dados);
             return ResponseEntity.ok(retornoAvaliacaoCliente);
         } catch (DadosClienteNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -46,5 +47,6 @@ public class AvaliadorCreditoController {
             return ResponseEntity.status(HttpStatus.resolve(e.getStatus())).body(e.getMessage());
         }
     }
+
 
 }

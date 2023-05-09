@@ -32,9 +32,8 @@ public class CartoesResource {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/renda")
+    @GetMapping(params = "renda")
     public ResponseEntity<List<Cartao>> getCartoesRendaAte(@RequestParam("renda") Long renda) {
-
         List<Cartao> list = service.getCartaoRendaMenorIgual(renda);
         return ResponseEntity.ok(list);
     }
