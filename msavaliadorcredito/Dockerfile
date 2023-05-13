@@ -1,9 +1,9 @@
-FROM maven:3.8.5-openjdk-11 as build
+FROM maven:3.8.5-openjdk-17 as build
 WORKDIR /app
 COPY . .
 RUN mvn package -Dmaven.test.skip=true
 
-FROM openjdk:11
+FROM openjdk:17
 WORKDIR /app
 COPY --from=build ./app/target/*.jar ./app.jar
 
